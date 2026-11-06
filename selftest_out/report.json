@@ -1,0 +1,98 @@
+{
+  "rows": [
+    {
+      "src_lang": "eng",
+      "said": "Good morning everyone, thank you for joining the call today.",
+      "heard": "Good morning everyone. Thank you for joining the call today.",
+      "fra_text": "Bonjour tout le monde, merci d'être venus aujourd'hui.",
+      "fra_to_mkd_subtitle": "Здраво, сите. Ви благодарам што дојдовте денес.",
+      "speech_s": 4.15,
+      "fra_speech_s": 2.82,
+      "s2s_s": 0.69,
+      "asr_s": 0.49,
+      "subtitle_s": 0.68
+    },
+    {
+      "src_lang": "eng",
+      "said": "We need to confirm the delivery date before the end of the week.",
+      "heard": "We need to confirm the delivery date before the end of the week.",
+      "fra_text": "Il faut qu'on confirme la date de livraison avant la fin de la semaine.",
+      "fra_to_mkd_subtitle": "Треба да го потврдиме датумот на испорака пред крајот на неделата.",
+      "speech_s": 3.83,
+      "fra_speech_s": 3.42,
+      "s2s_s": 0.91,
+      "asr_s": 0.49,
+      "subtitle_s": 0.74
+    },
+    {
+      "src_lang": "eng",
+      "said": "Could you please send me the updated price list by email?",
+      "heard": "could you please send me the updated price list by email?",
+      "fra_text": "Pourriez-vous me envoyer la liste de prix mise à jour par e-mail ?",
+      "fra_to_mkd_subtitle": "Може ли да ми ја испратите листата на премиса до ажурирање по е-мејл?",
+      "speech_s": 3.97,
+      "fra_speech_s": 2.96,
+      "s2s_s": 0.89,
+      "asr_s": 0.43,
+      "subtitle_s": 0.81
+    },
+    {
+      "src_lang": "mkd",
+      "said": "Добро утро на сите, ви благодарам што дојдовте на состанокот.",
+      "heard": "добро утро на сите, ви благодарам што дојдовте на состанокот",
+      "fra_text": "bonjour à tous, vous remerciez d'être venus à la réunion",
+      "fra_to_mkd_subtitle": "Добро утро, сите, ви благодарам што дојдовте на состанокот.",
+      "speech_s": 4.37,
+      "fra_speech_s": 3.12,
+      "s2s_s": 0.88,
+      "asr_s": 0.53,
+      "subtitle_s": 0.78
+    },
+    {
+      "src_lang": "mkd",
+      "said": "Треба да го потврдиме датумот на испорака до крајот на неделата.",
+      "heard": "треба да го потврдиме датумот на испорака до крајот на неделата",
+      "fra_text": "Il faut le confirmer la date de livraison jusqu'à la fin de la semaine",
+      "fra_to_mkd_subtitle": "Треба да се потврди датумот на испорака до крајот на неделата.",
+      "speech_s": 4.37,
+      "fra_speech_s": 3.8,
+      "s2s_s": 0.7,
+      "asr_s": 0.51,
+      "subtitle_s": 0.74
+    },
+    {
+      "src_lang": "mkd",
+      "said": "Ве молам, испратете ми го новиот ценовник по е-пошта.",
+      "heard": "ве молам испратете ми го новиот ценовник по е-пошта",
+      "fra_text": "Veuillez envoyer-moi le nouveau cédéral par e-mail",
+      "fra_to_mkd_subtitle": "Ве молам испратете ми го новиот Седерал по е-мејл.",
+      "speech_s": 3.98,
+      "fra_speech_s": 3.2,
+      "s2s_s": 0.68,
+      "asr_s": 0.53,
+      "subtitle_s": 0.72
+    }
+  ],
+  "load_s": 16.5,
+  "vram_after_load_gb": 4.66,
+  "vram_peak_gb": 4.74,
+  "vad": {
+    "segments": 9,
+    "segment_s": [
+      3.6,
+      3.3,
+      3.4,
+      3.6,
+      3.3,
+      3.5,
+      3.6,
+      3.3,
+      3.5
+    ],
+    "speech_in_s": 35.9,
+    "speech_out_s": 31.2,
+    "long_s": 23.9
+  },
+  "s2s_median_s": 0.79,
+  "s2s_max_s": 0.91
+}

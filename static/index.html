@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="mk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Толкувач</title>
+<style>
+:root{
+  --bg:#f6f5f2; --panel:#fff; --ink:#1d1f23; --mute:#6b6f76; --line:#e3e1dc;
+  --accent:#2f5bd3; --accent-ink:#fff; --me:#2f5bd3; --them:#0f8a6a; --warn:#b4540a; --err:#c0392b;
+  --chip:#eef1fb;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#121417; --panel:#1b1e23; --ink:#e8e9eb; --mute:#9aa0a8; --line:#2c3037;
+    --accent:#6f94ff; --accent-ink:#0d1220; --me:#7ea0ff; --them:#3cc79f; --warn:#f0a35c; --err:#ff7b6b; --chip:#232838;}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,"Segoe UI",sans-serif}
+header{display:flex;align-items:center;gap:14px;padding:14px 22px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:2}
+header h1{font-size:19px;margin:0;font-weight:650;letter-spacing:.2px}
+header .sub{color:var(--mute);font-size:13px}
+.pill{margin-left:auto;font-size:13px;padding:5px 11px;border-radius:99px;background:var(--chip);white-space:nowrap}
+.pill.ok{color:var(--them)} .pill.err{color:var(--err)} .pill.run{color:var(--accent)}
+main{display:grid;grid-template-columns:330px 1fr;gap:18px;padding:18px 22px;max-width:1400px;margin:0 auto}
+@media (max-width:900px){main{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card h2{font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--mute);margin:0 0 12px;font-weight:600}
+label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px}
+select,input[type=number]{width:100%;padding:8px 9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.check{display:flex;align-items:center;gap:8px;margin:8px 0;font-size:14px;color:var(--ink)}
+.hint{font-size:12.5px;color:var(--mute);margin-top:6px}
+.hint.warn{color:var(--warn)}
+button{font:inherit;border-radius:9px;border:1px solid var(--line);padding:10px 14px;cursor:pointer;background:var(--bg);color:var(--ink)}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent;font-weight:600;width:100%;padding:13px;font-size:16px}
+button.primary.stop{background:var(--err)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.toggle.on{background:var(--warn);color:#fff;border-color:transparent}
+.side{display:flex;flex-direction:column;gap:18px}
+.meters{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;font-size:13px;margin-top:12px}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;transition:width .1s}
+.bar.me i{background:var(--me)} .bar.them i{background:var(--them)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+.stat b{display:block;font-size:22px;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--mute)}
+@media (max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+main>*{min-width:0}
+.line{overflow-wrap:anywhere}
+@media (max-width:1100px){.cols{grid-template-columns:1fr}}
+.feed{height:52vh;overflow-y:auto;display:flex;flex-direction:column;gap:9px;padding-right:4px}
+.line{border-left:3px solid var(--me);padding:6px 10px;background:var(--bg);border-radius:0 8px 8px 0}
+.line.in{border-color:var(--them)}
+.line .t{font-size:16.5px}
+.line.in .t{font-size:18px;font-weight:500}
+.line .o{font-size:13px;color:var(--mute);margin-top:2px}
+.line .m{font-size:11.5px;color:var(--mute);margin-top:3px;font-variant-numeric:tabular-nums}
+.empty{color:var(--mute);font-size:14px;padding:20px 4px}
+.log{font:12px/1.5 ui-monospace,Consolas,monospace;color:var(--mute);max-height:150px;overflow-y:auto;white-space:pre-wrap}
+.log .e{color:var(--err)}
+.test{margin-top:18px}
+.test .res{margin-top:12px;font-size:15px}
+.test audio{width:100%;margin-top:8px}
+.seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--bg)}
+.seg button{flex:1;border:0;border-radius:0;padding:9px 8px;background:transparent}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.sel{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.seg button small{display:block;font-size:11.5px;opacity:.8;font-weight:400}
+.voice-try{display:flex;gap:10px;align-items:center;margin-top:12px}
+.voice-try audio{flex:1;min-width:0;height:36px}
+code{background:var(--chip);padding:1px 5px;border-radius:5px;font-size:12.5px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Толкувач</h1>
+  <span class="sub">преведувач во живо за Zoom, Meet и Teams, работи локално</span>
+  <span class="pill" id="pill">се поврзувам…</span>
+</header>
+<main>
+  <div class="side">
+    <section class="card">
+      <h2>Јазици</h2>
+      <div class="row">
+        <div><label for="my_lang">Јас зборувам</label><select id="my_lang"></select></div>
+        <div><label for="their_lang">Тие слушаат</label><select id="their_lang"></select></div>
+      </div>
+      <div class="hint">Твојот говор станува глас на нивниот јазик. Нивниот говор го добиваш како текст на твојот јазик.</div>
+    </section>
+
+    <section class="card">
+      <h2>Уреди</h2>
+      <label for="mic">Микрофон</label><select id="mic"></select>
+      <label for="out_device">Превод излегува на</label><select id="out_device"></select>
+      <div class="hint" id="cablehint"></div>
+      <label for="meeting_device">Состанокот го слушам на</label><select id="meeting_device"></select>
+      <div class="hint">Од овој уред се фаќа звукот на другите. Користи слушалки, не звучници.</div>
+    </section>
+
+    <section class="card">
+      <h2>Глас на преводот</h2>
+      <input type="hidden" id="gender" value="f"><input type="hidden" id="voice" value="natural">
+      <label>Кој глас те преведува</label>
+      <div class="seg" id="seg_gender"><button data-v="f">Женски</button><button data-v="m">Машки</button></div>
+      <label>Квалитет</label>
+      <div class="seg" id="seg_voice">
+        <button data-v="natural">Природен<small>убав глас, бара интернет</small></button>
+        <button data-v="local">Локален<small>без интернет, побрз</small></button>
+      </div>
+      <div class="hint" id="voicehint"></div>
+      <div class="voice-try"><button id="vprev" disabled>▶ Преслушај</button><audio id="vaudio" controls hidden></audio></div>
+    </section>
+
+    <section class="card">
+      <h2>Опции</h2>
+      <label class="check"><input type="checkbox" id="translate_me" checked> Преведувај го мојот говор</label>
+      <label class="check"><input type="checkbox" id="translate_them" checked> Титлови за другите</label>
+      <label class="check"><input type="checkbox" id="show_original" checked> Покажи го и оригиналот</label>
+      <div class="row">
+        <div><label for="silence_ms">Пауза за крај (ms)</label><input type="number" id="silence_ms" min="250" max="1500" step="50" value="550"></div>
+      </div>
+      <label for="max_lag">Прескокни нивни реченици постари од (сек)</label>
+      <input type="number" id="max_lag" min="2" max="30" step="1" value="8">
+    </section>
+  </div>
+
+  <div>
+    <section class="card" style="margin-bottom:18px">
+      <div class="row" style="align-items:stretch">
+        <button class="primary" id="go" disabled>Старт</button>
+        <button class="toggle" id="pass" style="flex:0 0 auto" disabled title="Мојот глас оди директно, без превод">Пропушти: исклучено</button>
+      </div>
+      <div class="meters">
+        <span>Јас</span><div class="bar me"><i id="lv_me"></i></div>
+        <span>Тие</span><div class="bar them"><i id="lv_them"></i></div>
+      </div>
+    </section>
+
+    <div class="stats">
+      <div class="stat"><b id="s_out">–</b><span>мое доцнење (медијана, сек)</span></div>
+      <div class="stat"><b id="s_in">–</b><span>нивно доцнење (медијана, сек)</span></div>
+      <div class="stat"><b id="s_vram">–</b><span>VRAM (GB)</span></div>
+      <div class="stat"><b id="s_drop">0</b><span>прескокнати реченици</span></div>
+    </div>
+
+    <div class="cols">
+      <section class="card"><h2>Јас → тие</h2><div class="feed" id="feed_out"><div class="empty">Тука ќе се појави што си рекол и како е преведено.</div></div></section>
+      <section class="card"><h2>Тие → јас</h2><div class="feed" id="feed_in"><div class="empty">Тука ќе се појават титловите за другите.</div></div></section>
+    </div>
+
+    <section class="card test">
+      <h2>Проба од датотека, без микрофон</h2>
+      <div class="row" style="align-items:end">
+        <div><label for="tfile">WAV датотека (до 30 сек)</label><input type="file" id="tfile" accept=".wav,audio/wav"></div>
+        <div style="flex:0 0 auto"><button id="tgo" disabled>Преведи</button></div>
+        <div style="flex:0 0 auto"><button id="tinj" disabled title="Работи кога е стартувано: датотеката оди низ целиот пат како да зборуваш во микрофонот">Пушти како мој говор</button></div>
+      </div>
+      <div class="res" id="tres"></div>
+    </section>
+
+    <section class="card test">
+      <h2>Дневник</h2>
+      <div class="log" id="log"></div>
+    </section>
+  </div>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const S = {model:'none', running:false};
+const ids = ['my_lang','their_lang','mic','out_device','meeting_device','translate_me','translate_them','show_original','voice','gender','silence_ms','max_lag'];
+const saved = (()=>{try{return JSON.parse(localStorage.getItem('tolkuvac')||'{}')}catch(e){return {}}})();
+
+function opt(sel, items, val){
+  sel.innerHTML='';
+  for(const [v,t] of items){const o=document.createElement('option');o.value=v;o.textContent=t;sel.appendChild(o)}
+  if(val!=null && items.some(([v])=>v===val)) sel.value=val;
+}
+async function init(){
+  const [L,D] = await Promise.all([fetch('/api/languages').then(r=>r.json()), fetch('/api/devices').then(r=>r.json())]);
+  opt($('my_lang'), Object.entries(L.mine), saved.my_lang||'mkd');
+  opt($('their_lang'), Object.entries(L.their), saved.their_lang||'fra');
+  const m = D.microphones.map(n=>[n,n]), s = D.speakers.map(n=>[n,n]);
+  opt($('mic'), m, saved.mic||D.default_microphone);
+  opt($('out_device'), s, saved.out_device||D.vb_cable||D.default_speaker);
+  opt($('meeting_device'), s, saved.meeting_device||D.default_speaker);
+  for(const k of ['translate_me','translate_them','show_original']) if(k in saved) $(k).checked=saved[k];
+  for(const k of ['voice','gender','silence_ms','max_lag']) if(k in saved) $(k).value=saved[k];
+  segUI();
+  $('cablehint').innerHTML = D.vb_cable
+    ? 'VB-Cable е пронајден. Во Zoom/Meet за микрофон избери <code>CABLE Output</code>.'
+    : 'VB-Cable не е инсталиран. Без него преводот го слушаш само ти (проба). За да го слушаат другите, инсталирај VB-Cable и во Zoom избери <code>CABLE Output</code> за микрофон.';
+  $('cablehint').className = 'hint' + (D.vb_cable?'':' warn');
+  checkEcho();
+}
+function settings(){
+  const o={};
+  for(const k of ids){const el=$(k); o[k] = el.type==='checkbox'?el.checked:(el.type==='number'?Number(el.value):el.value)}
+  try{localStorage.setItem('tolkuvac', JSON.stringify(o))}catch(e){}
+  return o;
+}
+const NAMES={f:{natural:'Денис / Ава / Катја… (Microsoft neural)',local:'женски глас на моделот'},
+             m:{natural:'Анри / Ендру / Конрад… (Microsoft neural)',local:'машки глас на моделот'}};
+function segUI(){
+  for(const k of ['gender','voice']) for(const b of $('seg_'+k).children) b.classList.toggle('sel', b.dataset.v===$(k).value);
+  $('voicehint').textContent = $('voice').value==='natural'
+    ? 'Звучи како вистински човек. Преведениот текст оди до Microsoft за да се изговори, и додава околу 1 сек. Ако нема интернет, реченицата ја кажува локалниот глас.'
+    : 'Сè останува на твојот компјутер и е најбрзо (~0.8 сек), но гласот звучи посинтетички.';
+  $('vaudio').hidden=true;
+}
+for(const k of ['gender','voice']) $('seg_'+k).addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return; $(k).value=b.dataset.v; segUI(); settings();
+  if(S.running) log('Новиот глас важи од следниот Старт.');
+});
+$('vprev').onclick=async()=>{
+  $('vprev').disabled=true; $('vprev').textContent='…';
+  try{
+    const r=await fetch('/api/voice_preview',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({tgt:$('their_lang').value,voice:$('voice').value,gender:$('gender').value})});
+    const j=await r.json();
+    if(!r.ok){log(j.detail||'грешка',true);return}
+    const a=$('vaudio'); a.src='data:audio/wav;base64,'+j.wav_b64; a.hidden=false; a.play().catch(()=>{});
+    log(`Преслушување (${j.used==='natural'?'природен':'локален'} глас, ${j.compute_s} сек): ${j.text}`);
+  } finally { $('vprev').disabled=S.model!=='ready'; $('vprev').textContent='▶ Преслушај'; }
+};
+function checkEcho(){
+  const same = $('out_device').value && $('out_device').value===$('meeting_device').value;
+  if(same) log('Излезот и состанокот се ист уред: додека се пушта твојот превод, звукот на другите не се фаќа.');
+}
+['out_device','meeting_device'].forEach(k=>$(k).addEventListener('change',checkEcho));
+
+function pill(){
+  const p=$('pill');
+  if(S.model==='loading'){p.textContent='се вчитува моделот… (првиот пат симнува ~9 GB)';p.className='pill'}
+  else if(S.model==='error'){p.textContent='грешка при вчитување';p.className='pill err'}
+  else if(S.running){p.textContent='● преведува';p.className='pill run'}
+  else if(S.model==='ready'){p.textContent='подготвен';p.className='pill ok'}
+  $('go').disabled = S.model!=='ready';
+  $('go').textContent = S.running?'Стоп':'Старт';
+  $('go').classList.toggle('stop', S.running);
+  $('pass').disabled = !S.running;
+  $('tgo').disabled = S.model!=='ready';
+  $('vprev').disabled = S.model!=='ready';
+  $('tinj').disabled = !S.running;
+}
+function log(t, err){const d=document.createElement('div');if(err)d.className='e';d.textContent=new Date().toLocaleTimeString()+'  '+t;$('log').appendChild(d);$('log').scrollTop=1e9}
+function line(ev){
+  const f=$(ev.dir==='out'?'feed_out':'feed_in');
+  f.querySelector('.empty')?.remove();
+  const d=document.createElement('div'); d.className='line '+ev.dir;
+  const t=document.createElement('div'); t.className='t'; t.textContent=ev.text||'(празно)'; d.appendChild(t);
+  if(ev.original){const o=document.createElement('div');o.className='o';o.textContent=ev.original;d.appendChild(o)}
+  const m=document.createElement('div'); m.className='m';
+  m.textContent=`${ev.time}  ·  говор ${ev.audio}с  ·  превод ${ev.compute}с  ·  доцнење ${ev.latency}с`
+    + (ev.voice?`  ·  ${ev.voice==='natural'?'природен':'локален'} глас`:''); d.appendChild(m);
+  f.appendChild(d); f.scrollTop=1e9;
+  (S.lat ||= {out:[],in:[]})[ev.dir].push(ev.latency);
+  const med=a=>{if(!a.length)return '–';const s=[...a].sort((x,y)=>x-y);return s[Math.floor(s.length/2)].toFixed(1)};
+  $('s_out').textContent=med(S.lat.out); $('s_in').textContent=med(S.lat.in);
+}
+function status(ev){
+  if(ev.state==='loading') S.model='loading';
+  if(ev.state==='ready'){S.model='ready';S.running=false}
+  if(ev.state==='running'){S.running=true; log('Почна. Запис: transcripts/'+ev.log)}
+  if(ev.state==='error'){S.model='error'; log(ev.error,true)}
+  if(ev.vram_gb!=null) $('s_vram').textContent=ev.vram_gb.toFixed(1);
+  if(ev.summary && ev.summary.vram_peak_gb) $('s_vram').textContent=ev.summary.vram_peak_gb.toFixed(1)+' max';
+  pill();
+}
+function connect(){
+  const ws=new WebSocket(`ws://${location.host}/ws`);
+  ws.onmessage=e=>{
+    const ev=JSON.parse(e.data);
+    if(ev.type==='hello'){
+      const st=ev.status; S.model=st.model; S.running=st.running;
+      if(st.vram_gb) $('s_vram').textContent=st.vram_gb.toFixed(1);
+      for(const h of ev.history){ if(h.type==='line') line(h); else if(h.type==='log') log(h.text,h.level==='error'); }
+      pill(); return;
+    }
+    if(ev.type==='status') status(ev);
+    else if(ev.type==='line') line(ev);
+    else if(ev.type==='log') log(ev.text, ev.level==='error');
+    else if(ev.type==='level') $('lv_'+ev.who).style.width=Math.min(100,ev.v*900)+'%';
+    else if(ev.type==='dropped'){ $('s_drop').textContent=ev.dropped; log(`Прескокната нивна реченица (чекаше ${ev.wait} сек)`) }
+    else if(ev.type==='passthrough') passUI(ev.on);
+  };
+  ws.onclose=()=>{$('pill').textContent='серверот не одговара';$('pill').className='pill err';setTimeout(connect,1500)};
+}
+function passUI(on){$('pass').classList.toggle('on',on);$('pass').textContent='Пропушти: '+(on?'вклучено':'исклучено')}
+
+$('go').onclick=async()=>{
+  $('go').disabled=true;
+  const r = S.running ? await fetch('/api/stop',{method:'POST'})
+    : await fetch('/api/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(settings())});
+  if(!r.ok) log((await r.json()).detail||'грешка',true);
+  const st=await fetch('/api/status').then(r=>r.json()); S.running=st.running; pill();
+};
+$('pass').onclick=async()=>{
+  const on=!$('pass').classList.contains('on');
+  await fetch('/api/passthrough',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({on})});
+};
+$('tgo').onclick=async()=>{
+  const f=$('tfile').files[0]; if(!f){$('tres').textContent='Избери WAV датотека.';return}
+  const fd=new FormData(); fd.append('file',f); fd.append('mode','speech'); fd.append('tgt',$('their_lang').value); fd.append('voice',$('voice').value); fd.append('gender',$('gender').value);
+  $('tres').textContent='Преведувам…'; $('tgo').disabled=true;
+  const r=await fetch('/api/test',{method:'POST',body:fd}); const j=await r.json(); $('tgo').disabled=false;
+  if(!r.ok){$('tres').textContent=j.detail||'грешка';return}
+  $('tres').innerHTML='';
+  const p=document.createElement('div'); p.textContent=j.text; $('tres').appendChild(p);
+  const m=document.createElement('div'); m.className='hint'; m.textContent=`говор ${j.audio_s} сек · превод ${j.compute_s} сек · VRAM максимум ${j.vram_peak_gb} GB`; $('tres').appendChild(m);
+  if(j.wav_b64){const a=document.createElement('audio');a.controls=true;a.src='data:audio/wav;base64,'+j.wav_b64;$('tres').appendChild(a)}
+};
+$('tinj').onclick=async()=>{
+  const f=$('tfile').files[0]; if(!f){$('tres').textContent='Избери WAV датотека.';return}
+  const fd=new FormData(); fd.append('file',f); fd.append('who','me');
+  const r=await fetch('/api/inject',{method:'POST',body:fd}); const j=await r.json();
+  $('tres').textContent = r.ok ? `Се пушта како твој говор (${j.seconds} сек). Преводот ќе излезе на избраниот уред и ќе се појави во „Јас → тие“.` : (j.detail||'грешка');
+};
+init().catch(e=>log('Не можам да ги прочитам уредите: '+e,true));
+connect();
+</script>
+</body>
+</html>
